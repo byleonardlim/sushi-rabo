@@ -1,0 +1,14 @@
+{
+  "name": "sushi-rabo",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:site": "pnpm --filter ./apps/site dev",
+    "build:site": "pnpm --filter ./apps/site build",
+    "lint:site": "pnpm --filter ./apps/site lint"
+  }
+}

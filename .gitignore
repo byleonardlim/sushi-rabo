@@ -1,0 +1,80 @@
+# ------------------------------
+# OS / Editor
+# ------------------------------
+.DS_Store
+Thumbs.db
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+.idea
+*.swp
+*.swo
+
+# ------------------------------
+# Logs
+# ------------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# ------------------------------
+# Dependencies / Package managers
+# ------------------------------
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# pnpm
+.pnpm-store/
+
+# ------------------------------
+# Build outputs
+# ------------------------------
+dist/
+build/
+out/
+coverage/
+*.tsbuildinfo
+
+# Next.js
+.next/
+next-env.d.ts
+
+# ------------------------------
+# Caches / tooling
+# ------------------------------
+.turbo/
+.cache/
+.eslintcache
+.stylelintcache
+
+# ------------------------------
+# Env / secrets
+# ------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ------------------------------
+# Hosting
+# ------------------------------
+.vercel/
+
+# ------------------------------
+# Misc
+# ------------------------------
+*.local
