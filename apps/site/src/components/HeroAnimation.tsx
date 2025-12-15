@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -16,11 +16,9 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    // Check if image is already loaded (e.g. from cache)
-    if (logoRef.current?.complete) {
-      setIsLoaded(true);
-    }
+  const setLogoNode = useCallback((node: HTMLImageElement | null) => {
+    logoRef.current = node;
+    if (node?.complete) setIsLoaded(true);
   }, []);
 
   useEffect(() => {
@@ -120,7 +118,7 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
              {/* Using simple img tag for GSAP compatibility and ref handling simplicity */}
              {/* eslint-disable-next-line @next/next/no-img-element */}
              <img
-                ref={logoRef}
+                ref={setLogoNode}
                 src="/assets/svg/sushi-rabo-brand.svg"
                 alt="Sushi Rabo Logo"
                 className="w-24 sm:w-36 md:w-[15vw] max-w-[240px] h-auto block" 

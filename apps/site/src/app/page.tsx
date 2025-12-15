@@ -14,7 +14,7 @@ export default function Home() {
           </h1>
           
           <p className="mt-6 max-w-3xl text-xl text-center leading-8 text-muted-foreground">
-            Forget the chopsticks. Build your custom maki roll layer-by-layer and experience the "Push-Pop" revolution. Zero mess, maximum flavor, designed for the Singapore hustle.
+            Forget the chopsticks. Build your custom maki roll layer-by-layer and experience the &quot;Push-Pop&quot; revolution. Zero mess, maximum flavor, designed for the Singapore hustle.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 w-full">

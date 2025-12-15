@@ -24,7 +24,7 @@ export function WaitlistForm() {
     return (
       <div className="flex items-center gap-2 text-primary font-medium p-4 bg-surface rounded-lg animate-in fade-in slide-in-from-bottom-2">
         <Check className="w-5 h-5" />
-        <span>You're on the list! We'll be in touch.</span>
+        <span>You&apos;re on the list! We&apos;ll be in touch.</span>
       </div>
     );
   }
