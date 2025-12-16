@@ -10,7 +10,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com",
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://sushirabo.com",
   ),
   title: {
     default: "Sushi Rabo",
@@ -51,7 +51,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sushirabo.com";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -65,6 +65,10 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} antialiased`}
       >
+        <script
+          defer
+          src="https://cdn.overtracking.com/t/tSBhikuuVbm46HnIJ/"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
