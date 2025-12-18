@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         email: trimmedEmail,
-        groups: ["bq8g0y"],
+        groups: ["el6Jqj"],
       }),
     });
   } catch {
