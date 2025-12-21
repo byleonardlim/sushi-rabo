@@ -96,9 +96,8 @@ export function ProductViewer() {
         dpr={[1, 2]}
         className="pointer-events-auto" // Enable events on canvas
       >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[-10, 10, 10]} intensity={1} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
+        <ambientLight intensity={1} />
+        <pointLight position={[-10, 10, 10]} intensity={0.5} />
         <Environment preset="warehouse" />
         
         <Suspense fallback={null}>

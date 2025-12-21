@@ -6,7 +6,7 @@ import { ProductViewer } from "@/components/ProductViewer";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-background font-sans text-foreground selection:bg-primary selection:text-primary-foreground">
+    <div className="flex h-[100vh] flex-col bg-background font-sans text-foreground selection:bg-primary selection:text-primary-foreground">
       {/* Hero Section */}
       <main className="flex-1">
         <HeroAnimation>
@@ -31,13 +31,13 @@ export default function Home() {
           id="description-section" 
           className="h-[100vh] relative bg-surface px-6 py-24 sm:py-32 overflow-hidden">
           <ProductViewer />
-          <div className="mx-auto max-w-7xl relative z-10 h-full flex items-center justify-center">
-            <div className="max-w-5xl text-center">
+          <div className="mx-auto max-w-7xl relative z-10 h-full flex items-end lg:items-center justify-center">
+            <div className="max-w-5xl">
               <h2 className="text-4xl font-bold tracking-tight lg:text-[5rem] mb-6">
-                <span className="text-primary">Reimagining the Roll</span>
+                <span className="text-primary">Eat Clean. Literally.</span>
               </h2>
-              <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                We believe that great sushi shouldn&apos;t be complicated. Our innovative packaging and roll design allow you to enjoy premium quality sushi anywhere, anytime, without the need for chopsticks or soy sauce packets. It&apos;s clean, simple, and ready when you are.
+              <p className="max-w-3xl text-lg leading-8 text-muted-foreground text-center">
+                Forget sticky fingers, soy sauce stains, and single-use plastic guilt. We&rsquo;ve replaced the messy balancing act of traditional takeout with a rigid, environmentally friendly push-tube that delivers a clean, perfect bite every time.
               </p>
             </div>
           </div>
