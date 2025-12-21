@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Instagram, Linkedin, Twitter } from "lucide-react";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { HeroAnimation } from "@/components/HeroAnimation";
+import { ProductViewer } from "@/components/ProductViewer";
 
 export default function Home() {
   return (
@@ -26,29 +27,21 @@ export default function Home() {
         </HeroAnimation>
 
         {/* Description Section */}
-        {/*
-        <section className="bg-surface px-6 py-24 sm:py-32">
-          <div className="mx-auto max-w-7xl">
-            <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6">
-                  Reimagining the Roll
-                </h2>
-                <p className="text-lg leading-8 text-muted-foreground">
-                  We believe that great sushi shouldn't be complicated. Our innovative packaging and roll design allow you to enjoy premium quality sushi anywhere, anytime, without the need for chopsticks or soy sauce packets. It's clean, simple, and ready when you are.
-                </p>
-              </div>
-              <div className="relative aspect-video overflow-hidden rounded-2xl bg-background/50 border border-border flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="text-4xl mb-2">🍣</div>
-                  <div className="text-sm font-medium text-muted-foreground">Product Preview</div>
-                  <div className="text-xs text-muted-foreground/60 mt-1">Coming Soon</div>
-                </div>
-              </div>
+        <section
+          id="description-section" 
+          className="h-[100vh] relative bg-surface px-6 py-24 sm:py-32 overflow-hidden">
+          <ProductViewer />
+          <div className="mx-auto max-w-7xl relative z-10 h-full flex items-center justify-center">
+            <div className="max-w-5xl text-center">
+              <h2 className="text-4xl font-bold tracking-tight lg:text-[5rem] mb-6">
+                <span className="text-primary">Reimagining the Roll</span>
+              </h2>
+              <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
+                We believe that great sushi shouldn&apos;t be complicated. Our innovative packaging and roll design allow you to enjoy premium quality sushi anywhere, anytime, without the need for chopsticks or soy sauce packets. It&apos;s clean, simple, and ready when you are.
+              </p>
             </div>
           </div>
         </section>
-        */}
       </main>
 
       {/* Footer */}

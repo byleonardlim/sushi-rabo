@@ -63,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${outfit.variable} antialiased`}
+        className={`${outfit.variable} antialiased overflow-x-hidden`}
       >
         <script
           defer
