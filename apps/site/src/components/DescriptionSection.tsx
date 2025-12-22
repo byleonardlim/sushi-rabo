@@ -11,7 +11,7 @@ export function DescriptionSection() {
   return (
     <section
       id="description-section"
-      className="min-h-screen relative bg-surface px-6 py-24 sm:py-32 overflow-hidden"
+      className="h-[100vh] relative bg-surface px-6 py-24 sm:py-32 overflow-hidden"
     >
       <ProductViewer domRefs={{ cleanRef, goRef }} />
       <div className="mx-auto max-w-7xl relative z-10 h-full flex items-end lg:items-center justify-center">
