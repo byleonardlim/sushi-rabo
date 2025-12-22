@@ -108,7 +108,7 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
       {/* Overlay for the 'blur fade' effect */}
       <div 
         ref={overlayRef}
-        className="absolute inset-0 z-0 bg-background/20 pointer-events-none" // Added slight tint for better blur visibility
+        className="absolute inset-0 z-0 bg-background/20 pointer-events-none backdrop-blur-sm" // Added slight tint for better blur visibility
         style={{ opacity: 1 }} // Initial state before hydration/GSAP takes over
       />
 

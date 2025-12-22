@@ -2,11 +2,11 @@ import Link from "next/link";
 import { Instagram, Linkedin, Twitter } from "lucide-react";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { HeroAnimation } from "@/components/HeroAnimation";
-import { ProductViewer } from "@/components/ProductViewer";
+import { DescriptionSection } from "@/components/DescriptionSection";
 
 export default function Home() {
   return (
-    <div className="flex h-[100vh] flex-col bg-background font-sans text-foreground selection:bg-primary selection:text-primary-foreground">
+    <div className="flex min-h-screen flex-col bg-background font-sans text-foreground selection:bg-primary selection:text-primary-foreground">
       {/* Hero Section */}
       <main className="flex-1">
         <HeroAnimation>
@@ -27,25 +27,11 @@ export default function Home() {
         </HeroAnimation>
 
         {/* Description Section */}
-        <section
-          id="description-section" 
-          className="h-[100vh] relative bg-surface px-6 py-24 sm:py-32 overflow-hidden">
-          <ProductViewer />
-          <div className="mx-auto max-w-7xl relative z-10 h-full flex items-end lg:items-center justify-center">
-            <div className="max-w-5xl">
-              <h2 className="text-4xl font-bold tracking-tight lg:text-[5rem] mb-6">
-                <span className="text-primary">Eat Clean. Literally.</span>
-              </h2>
-              <p className="max-w-3xl text-lg leading-8 text-muted-foreground text-center">
-                Forget sticky fingers, soy sauce stains, and single-use plastic guilt. We&rsquo;ve replaced the messy balancing act of traditional takeout with a rigid, environmentally friendly push-tube that delivers a clean, perfect bite every time.
-              </p>
-            </div>
-          </div>
-        </section>
+        <DescriptionSection />
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-background py-12">
+      <footer className="h-[30vh] border-t border-border bg-background py-12">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 md:flex-row">
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Sushi Rabo. All rights reserved.
