@@ -14,6 +14,11 @@ interface DOMRefs {
   goRef: RefObject<HTMLDivElement | null>;
 }
 
+interface ProductViewerProps {
+  domRefs?: DOMRefs;
+  triggerRef?: RefObject<HTMLElement | null>;
+}
+
 function LoadingEvents() {
   const { progress } = useProgress();
   const lastProgress = useRef<number | null>(null);
@@ -31,7 +36,7 @@ function LoadingEvents() {
   return null;
 }
 
-function Model({ domRefs }: { domRefs?: DOMRefs }) {
+function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObject<HTMLElement | null> }) {
   const { scene, nodes } = useGLTF("/3d/product.glb");
   const { camera } = useThree();
   const modelRef = useRef<Object3D | null>(null);
@@ -61,135 +66,136 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
       tubeCoverOriginalY.current = nodes.Tube_Cover.position.y;
     }
 
-    // Example: Animate the entire group rotation on scroll
-    // You can also target individual nodes like: nodes.YourNodeName.position
-    
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: "#description-section", // Using body/document as trigger since canvas is fixed background
-        start: "top top",
-        end: "+=100%",
-        scrub: 1,
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      },
-    });
+    const ctx = gsap.context(() => {
+      const trigger = triggerRef?.current || "#description-section";
 
-    // Animate camera from top-down to isometric view over scroll
-    tl.fromTo(
-      camera.position,
-      { x: 0, y: 10, z: 0.001 },
-      {
-        x: 0,
-        y: 5,
-        z: 8, // end in isometric-style view (matches Canvas default)
-        duration: 1,
-        ease: "power1.inOut",
-        onUpdate: () => {
-          camera.lookAt(0, 0, 0);
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: trigger, 
+          start: "top top",
+          end: () => "+=" + window.innerHeight * 1.5, // Functional value to recalculate on refresh
+          scrub: 1,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
         },
-      },
-      0
-    );
+      });
 
-    // 2. Animate Sushi_Maki object Y translation
-    if (nodes.Sushi_Maki) {
-      tl.to(
-        nodes.Sushi_Maki.position,
+      // Animate camera from top-down to isometric view over scroll
+      tl.fromTo(
+        camera.position,
+        { x: 0, y: 10, z: 0.001 },
         {
-          y: 0.8, // Move along Y axis
-          duration: 0.8,
+          x: 0,
+          y: 5,
+          z: 8, // end in isometric-style view (matches Canvas default)
+          duration: 1,
           ease: "power1.inOut",
+          onUpdate: () => {
+            camera.lookAt(0, 0, 0);
+          },
         },
-        0.24 // Insert at start of timeline
+        0
       );
-    }
 
-    // 3. Staggered Tube_Cover object Y translation
-    if (nodes.Tube_Cover) {
-      tl.to(
-        nodes.Tube_Cover.position,
-        {
-          y: 1.5, // Move along Y axis
-          duration: 0.8,
-          ease: "power1.inOut",
-        },
-        0.15 // Slightly after Sushi_Maki for staggered effect
-      );
-    }
+      // 2. Animate Sushi_Maki object Y translation
+      if (nodes.Sushi_Maki) {
+        tl.to(
+          nodes.Sushi_Maki.position,
+          {
+            y: 0.8, // Move along Y axis
+            duration: 0.8,
+            ease: "power1.inOut",
+          },
+          0.24 // Insert at start of timeline
+        );
+      }
 
-    if (nodes.Sushi_Maki && sushiMakiOriginalY.current !== null) {
-      tl.to(
-        nodes.Sushi_Maki.position,
-        {
-          y: sushiMakiOriginalY.current,
-          duration: 0.8,
-          ease: "power1.inOut",
-        },
-        1.2
-      );
-    }
+      // 3. Staggered Tube_Cover object Y translation
+      if (nodes.Tube_Cover) {
+        tl.to(
+          nodes.Tube_Cover.position,
+          {
+            y: 1.5, // Move along Y axis
+            duration: 0.8,
+            ease: "power1.inOut",
+          },
+          0.15 // Slightly after Sushi_Maki for staggered effect
+        );
+      }
 
-    if (nodes.Tube_Cover && tubeCoverOriginalY.current !== null) {
-      tl.to(
-        nodes.Tube_Cover.position,
-        {
-          y: tubeCoverOriginalY.current,
-          duration: 0.8,
-          ease: "power1.inOut",
-        },
-        1.2
-      );
-    }
+      if (nodes.Sushi_Maki && sushiMakiOriginalY.current !== null) {
+        tl.to(
+          nodes.Sushi_Maki.position,
+          {
+            y: sushiMakiOriginalY.current,
+            duration: 0.8,
+            ease: "power1.inOut",
+          },
+          1.2
+        );
+      }
 
-    // DOM Animations synced with the timeline
-    if (domRefs?.cleanRef.current) {
-      tl.to(
-        domRefs.cleanRef.current,
-        {
-          autoAlpha: 0,
-          y: -24,
-          filter: "blur(12px)",
-          ease: "power1.inOut",
-          duration: 0.35,
-        },
-        1.2
-      );
-    }
+      if (nodes.Tube_Cover && tubeCoverOriginalY.current !== null) {
+        tl.to(
+          nodes.Tube_Cover.position,
+          {
+            y: tubeCoverOriginalY.current,
+            duration: 0.8,
+            ease: "power1.inOut",
+          },
+          1.2
+        );
+      }
 
-    if (domRefs?.goRef.current) {
+      // DOM Animations synced with the timeline
+      if (domRefs?.cleanRef.current) {
+        tl.to(
+          domRefs.cleanRef.current,
+          {
+            autoAlpha: 0,
+            y: -24,
+            filter: "blur(12px)",
+            ease: "power1.inOut",
+            duration: 0.35,
+          },
+          1.2
+        );
+      }
+
+      if (domRefs?.goRef.current) {
+        tl.to(
+          domRefs.goRef.current,
+          {
+            autoAlpha: 1,
+            y: 0,
+            filter: "blur(0px)",
+            ease: "power1.inOut",
+            duration: 0.45,
+          },
+          1.2
+        );
+      }
+
       tl.to(
-        domRefs.goRef.current,
+        camera.position,
         {
-          autoAlpha: 1,
+          x: 0,
           y: 0,
-          filter: "blur(0px)",
+          z: 14,
+          duration: 0.9,
           ease: "power1.inOut",
-          duration: 0.45,
+          onStart: () => {
+            camera.up.set(0, 1, 0);
+          },
+          onUpdate: () => {
+            camera.lookAt(0, 0, 0);
+          },
         },
         1.2
       );
-    }
-
-    tl.to(
-      camera.position,
-      {
-        x: 0,
-        y: 0,
-        z: 14,
-        duration: 0.9,
-        ease: "power1.inOut",
-        onStart: () => {
-          camera.up.set(0, 1, 0);
-        },
-        onUpdate: () => {
-          camera.lookAt(0, 0, 0);
-        },
-      },
-      1.2
-    );
+    });
 
     if (!hasDispatchedLoaded.current && typeof window !== "undefined") {
       hasDispatchedLoaded.current = true;
@@ -199,9 +205,9 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
 
     return () => {
       // Cleanup
-      tl.kill();
+      ctx.revert();
     };
-  }, [nodes, camera, domRefs]);
+  }, [nodes, camera, domRefs, triggerRef]);
 
   return (
     <primitive 
@@ -213,9 +219,9 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
   );
 }
 
-export function ProductViewer({ domRefs }: { domRefs?: DOMRefs }) {
+export function ProductViewer({ domRefs, triggerRef }: ProductViewerProps) {
   return (
-    <div className="absolute inset-0 h-full w-full pointer-events-none">
+    <div className="absolute inset-0 w-full h-full">
       <Canvas
         camera={{ position: [0, 0, 14], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
@@ -228,7 +234,7 @@ export function ProductViewer({ domRefs }: { domRefs?: DOMRefs }) {
         <Environment preset="warehouse" />
         
         <Suspense fallback={null}>
-          <Model domRefs={domRefs} />
+          <Model domRefs={domRefs} triggerRef={triggerRef} />
         </Suspense>
 
         {/* Disabled autoRotate to let ScrollTrigger take control, but kept OrbitControls for user interaction */}

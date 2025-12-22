@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function HeroAnimation({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,6 +27,13 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Reset scroll position and disable browser scroll restoration to ensure
+    // the intro animation starts from the top and calculations are correct.
+    window.scrollTo(0, 0);
+    if (window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
     const onAssetsLoaded = () => setAssetsLoaded(true);
     
     if ((window as any).sushiRaboAssetsLoaded) {
@@ -42,6 +52,9 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
     return () => {
       window.removeEventListener('sushi-rabo-assets-loaded', onAssetsLoaded);
       window.removeEventListener('sushi-rabo-assets-progress', onAssetsProgress);
+      if (window.history) {
+        window.history.scrollRestoration = 'auto';
+      }
     };
   }, []);
 
@@ -57,6 +70,11 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
     } else {
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
+      // Refresh ScrollTrigger to ensure positions are correct after scroll unlock
+      // Small timeout to allow layout to settle
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 100);
     }
 
     return () => {
