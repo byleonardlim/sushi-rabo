@@ -2,19 +2,19 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Register ScrollTrigger safely
-if (typeof window !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
-}
 
 export function HeroAnimation({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
+  const introLogoRef = useRef<HTMLImageElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [assetsProgress, setAssetsProgress] = useState(0);
+  const [animationComplete, setAnimationComplete] = useState(false);
+
+  const isIntro = !animationComplete;
 
   const setLogoNode = useCallback((node: HTMLImageElement | null) => {
     logoRef.current = node;
@@ -22,75 +22,106 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Only run animation logic if window exists and image is loaded
-    if (typeof window === "undefined" || !isLoaded) return;
+    if (typeof window === "undefined") return;
+
+    const onAssetsLoaded = () => setAssetsLoaded(true);
+    
+    if ((window as any).sushiRaboAssetsLoaded) {
+      setAssetsLoaded(true);
+    }
+    
+    window.addEventListener('sushi-rabo-assets-loaded', onAssetsLoaded);
+
+    const onAssetsProgress = (e: Event) => {
+      const customEvent = e as CustomEvent<{ progress?: number }>;
+      const p = customEvent.detail?.progress;
+      if (typeof p === 'number') setAssetsProgress(p);
+    };
+    window.addEventListener('sushi-rabo-assets-progress', onAssetsProgress);
+
+    return () => {
+      window.removeEventListener('sushi-rabo-assets-loaded', onAssetsLoaded);
+      window.removeEventListener('sushi-rabo-assets-progress', onAssetsProgress);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+
+    if (!animationComplete) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+    }
+
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+    };
+  }, [animationComplete]);
+
+  useEffect(() => {
+    // Only run animation logic if window exists and required assets are loaded
+    if (typeof window === "undefined" || !isLoaded || !assetsLoaded) return;
     
     // Small timeout to ensure layout is settled after image load
     const timer = setTimeout(() => {
         const ctx = gsap.context(() => {
-            if (!logoRef.current || !containerRef.current) return;
+            if (!introLogoRef.current || !logoRef.current || !containerRef.current) return;
 
-            // Function to calculate the Y offset to center the logo
-            // using offsetTop is safer as it's relative to the container and ignores scroll/transforms
-            const getCenterOffset = () => {
-                if (!logoRef.current || !containerRef.current) return 0;
-                
-                const windowHeight = window.innerHeight;
-                const centerY = windowHeight / 2;
-                
-                // Calculate logo's top relative to the container by traversing offsetParents
-                let logoTop = 0;
-                let el = logoRef.current as HTMLElement | null;
-                while (el && el !== containerRef.current) {
-                    logoTop += el.offsetTop;
-                    el = el.offsetParent as HTMLElement;
-                }
-                
-                const logoHeight = logoRef.current.offsetHeight;
-                const logoCenterY = logoTop + (logoHeight / 2);
-                
-                // The container is usually pinned at top:0, so container coordinates map well to viewport
-                // However, we want the translation Y that moves the logo from Natural to Center.
-                // Current pos: logoCenterY. Target pos: centerY.
-                // Delta = Target - Current
-                return centerY - logoCenterY;
-            };
+            const introEl = introLogoRef.current;
+            const targetEl = logoRef.current;
 
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: "top top",
-                    end: "+=100%", // 100vh scroll distance
-                    scrub: 1, // Smooth scrubbing
-                    pin: true,
-                    pinSpacing: true,
-                    anticipatePin: 1,
-                    invalidateOnRefresh: true, // Recalculate functional values on resize
-                }
+            gsap.set(targetEl, { autoAlpha: 0, scale: 0.6, transformOrigin: 'center center' });
+
+            const introRect = introEl.getBoundingClientRect();
+            const targetRect = targetEl.getBoundingClientRect();
+
+            const dx = targetRect.left - introRect.left;
+            const dy = targetRect.top - introRect.top;
+            const scale = introRect.width ? targetRect.width / introRect.width : 1;
+
+            gsap.set(introEl, {
+                position: 'fixed',
+                left: introRect.left,
+                top: introRect.top,
+                margin: 0,
+                transformOrigin: 'top left',
+                willChange: 'transform, opacity',
+                zIndex: 30,
             });
 
-            tl.fromTo(logoRef.current, 
-                {
-                    scale: 1.5, 
-                    y: getCenterOffset, // Use function for dynamic calculation
-                },
-                {
-                    scale: 0.6,
-                    y: 0,
-                    ease: "power2.inOut",
-                    duration: 1
-                }
+            const tl = gsap.timeline();
+
+            tl.to(introEl, {
+                x: dx,
+                y: dy,
+                scale,
+                ease: 'power3.inOut',
+                duration: 1.1,
+            })
+            .fromTo(
+                overlayRef.current,
+                { autoAlpha: 1, backdropFilter: 'blur(20px)' },
+                { autoAlpha: 0, backdropFilter: 'blur(0px)', ease: 'power2.inOut', duration: 0.9 },
+                '<'
             )
-            .fromTo(overlayRef.current,
-                { autoAlpha: 1, backdropFilter: "blur(20px)" },
-                { autoAlpha: 0, backdropFilter: "blur(0px)", ease: "power2.inOut", duration: 0.8 },
-                "<"
+            .fromTo(
+                contentRef.current,
+                { autoAlpha: 0, y: 24 },
+                { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.8 },
+                '-=0.55'
             )
-            .fromTo(contentRef.current,
-                { autoAlpha: 0, y: 50 },
-                { autoAlpha: 1, y: 0, ease: "power2.out", duration: 0.8 },
-                "-=0.6"
-            );
+            .add(() => {
+                gsap.set(targetEl, { autoAlpha: 1, scale: 0.6, transformOrigin: 'center center' });
+                gsap.set(introEl, { autoAlpha: 0 });
+            })
+            .eventCallback('onComplete', () => setAnimationComplete(true));
 
         }, containerRef);
 
@@ -98,10 +129,10 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [isLoaded]); // Depend on isLoaded
+  }, [isLoaded, assetsLoaded]); // Depend on loading signals
 
   return (
-    <div ref={containerRef} className="relative min-h-screen w-full flex flex-col items-center justify-start overflow-hidden pt-24 sm:pt-32 lg:pt-40 pb-10 z-10">
+    <div ref={containerRef} className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden pt-24 sm:pt-32 lg:pt-40 pb-10 z-10">
       {/* Background Gradient (revealed as overlay fades) */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_40%_at_50%_50%,var(--surface)_0%,transparent_100%)] opacity-30" />
 
@@ -110,7 +141,29 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
         ref={overlayRef}
         className="absolute inset-0 z-0 bg-background/20 pointer-events-none backdrop-blur-sm" // Added slight tint for better blur visibility
         style={{ opacity: 1 }} // Initial state before hydration/GSAP takes over
-      />
+      >
+      </div>
+
+      {isIntro && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          {/* Gradient Loader Indicator */}
+          <div 
+            className="absolute w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-[radial-gradient(circle,var(--color-primary)_0%,transparent_100%)] rounded-full blur-3xl transition-all duration-300 ease-out -z-10"
+            style={{ 
+              opacity: assetsLoaded ? 0 : Math.max(0.1, assetsProgress / 100 * 0.3), // Max opacity 0.3 to keep it subtle
+              transform: `scale(${0.5 + (assetsProgress / 100) * 0.5})` 
+            }}
+          />
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={introLogoRef}
+            src="/assets/svg/sushi-rabo-brand.svg"
+            alt="Sushi Rabo Logo"
+            className="w-24 sm:w-36 md:w-[15vw] max-w-[240px] h-auto block"
+          />
+        </div>
+      )}
 
       <div className="z-10 flex flex-col items-center w-full max-w-7xl px-6 relative">
         {/* Logo Wrapper */}
@@ -121,8 +174,7 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
                 ref={setLogoNode}
                 src="/assets/svg/sushi-rabo-brand.svg"
                 alt="Sushi Rabo Logo"
-                className="w-24 sm:w-36 md:w-[15vw] max-w-[240px] h-auto block" 
-                style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.2s' }} 
+                className="w-24 sm:w-36 md:w-[15vw] max-w-[240px] h-auto block invisible" 
                 onLoad={() => setIsLoaded(true)}
              />
         </div>

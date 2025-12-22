@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useThree } from "@react-three/fiber";
-import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { Environment, OrbitControls, useGLTF, useProgress } from "@react-three/drei";
 import { Suspense, useLayoutEffect, useRef, RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -14,12 +14,30 @@ interface DOMRefs {
   goRef: RefObject<HTMLDivElement | null>;
 }
 
+function LoadingEvents() {
+  const { progress } = useProgress();
+  const lastProgress = useRef<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (typeof window === "undefined") return;
+    const rounded = Math.round(progress);
+    if (lastProgress.current === rounded) return;
+    lastProgress.current = rounded;
+    window.dispatchEvent(
+      new CustomEvent("sushi-rabo-assets-progress", { detail: { progress: rounded } })
+    );
+  }, [progress]);
+
+  return null;
+}
+
 function Model({ domRefs }: { domRefs?: DOMRefs }) {
   const { scene, nodes } = useGLTF("/3d/product.glb");
   const { camera } = useThree();
   const modelRef = useRef<Object3D | null>(null);
   const sushiMakiOriginalY = useRef<number | null>(null);
   const tubeCoverOriginalY = useRef<number | null>(null);
+  const hasDispatchedLoaded = useRef(false);
 
   useLayoutEffect(() => {
     // Wait for scene to be ready
@@ -31,8 +49,8 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
 
     // Initial states for DOM elements
     if (domRefs?.cleanRef.current && domRefs?.goRef.current) {
-      gsap.set(domRefs.goRef.current, { autoAlpha: 0, y: 24 });
-      gsap.set(domRefs.cleanRef.current, { autoAlpha: 1, y: 0 });
+      gsap.set(domRefs.goRef.current, { autoAlpha: 0, y: 24, filter: "blur(12px)" });
+      gsap.set(domRefs.cleanRef.current, { autoAlpha: 1, y: 0, filter: "blur(0px)" });
     }
 
     if (nodes.Sushi_Maki && sushiMakiOriginalY.current === null) {
@@ -85,7 +103,7 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
           duration: 0.8,
           ease: "power1.inOut",
         },
-        0.15 // Insert at start of timeline
+        0.24 // Insert at start of timeline
       );
     }
 
@@ -98,7 +116,7 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
           duration: 0.8,
           ease: "power1.inOut",
         },
-        0 // Slightly after Sushi_Maki for staggered effect
+        0.15 // Slightly after Sushi_Maki for staggered effect
       );
     }
 
@@ -133,6 +151,7 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
         {
           autoAlpha: 0,
           y: -24,
+          filter: "blur(12px)",
           ease: "power1.inOut",
           duration: 0.35,
         },
@@ -146,6 +165,7 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
         {
           autoAlpha: 1,
           y: 0,
+          filter: "blur(0px)",
           ease: "power1.inOut",
           duration: 0.45,
         },
@@ -171,6 +191,12 @@ function Model({ domRefs }: { domRefs?: DOMRefs }) {
       1.2
     );
 
+    if (!hasDispatchedLoaded.current && typeof window !== "undefined") {
+      hasDispatchedLoaded.current = true;
+      (window as any).sushiRaboAssetsLoaded = true;
+      window.dispatchEvent(new Event("sushi-rabo-assets-loaded"));
+    }
+
     return () => {
       // Cleanup
       tl.kill();
@@ -191,11 +217,12 @@ export function ProductViewer({ domRefs }: { domRefs?: DOMRefs }) {
   return (
     <div className="absolute inset-0 h-full w-full pointer-events-none">
       <Canvas
-        camera={{ position: [0, 5, 8], fov: 40 }}
+        camera={{ position: [0, 0, 14], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
         className="pointer-events-auto" // Enable events on canvas
       >
+        <LoadingEvents />
         <ambientLight intensity={1} />
         <pointLight position={[-10, 10, 10]} intensity={0.5} />
         <Environment preset="warehouse" />
