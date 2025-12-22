@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useThree } from "@react-three/fiber";
-import { Environment, OrbitControls, useGLTF, useProgress } from "@react-three/drei";
+import { Environment, useGLTF, useProgress } from "@react-three/drei";
 import { Suspense, useLayoutEffect, useRef, RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -221,12 +221,12 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
 
 export function ProductViewer({ domRefs, triggerRef }: ProductViewerProps) {
   return (
-    <div className="absolute inset-0 w-full h-full">
+    <div className="absolute inset-0 w-full h-full pointer-events-none [&_canvas]:!pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 14], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
-        className="pointer-events-auto touch-auto" // Enable events on canvas
+        className="pointer-events-none" // Ensure canvas itself is passive
       >
         <LoadingEvents />
         <ambientLight intensity={1} />
@@ -236,13 +236,6 @@ export function ProductViewer({ domRefs, triggerRef }: ProductViewerProps) {
         <Suspense fallback={null}>
           <Model domRefs={domRefs} triggerRef={triggerRef} />
         </Suspense>
-
-        {/* Disabled autoRotate to let ScrollTrigger take control, but kept OrbitControls for user interaction */}
-        <OrbitControls 
-          enableZoom={false}
-          enablePan={false}
-          enableRotate={false}
-        />
       </Canvas>
     </div>
   );
