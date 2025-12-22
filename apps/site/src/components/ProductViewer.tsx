@@ -226,7 +226,7 @@ export function ProductViewer({ domRefs, triggerRef }: ProductViewerProps) {
         camera={{ position: [0, 0, 14], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
-        className="pointer-events-auto" // Enable events on canvas
+        className="pointer-events-auto touch-auto" // Enable events on canvas
       >
         <LoadingEvents />
         <ambientLight intensity={1} />
