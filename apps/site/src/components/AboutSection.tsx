@@ -1,4 +1,4 @@
-import { WaitlistForm, WaitlistButton } from "./WaitlistForm";
+import { WaitlistButton } from "./WaitlistForm";
 import { WaitlistModal } from "./WaitlistModal";
 import { useWaitlist } from "./WaitlistProvider";
 
@@ -15,13 +15,13 @@ export function AboutSection() {
         </h2>
         <div className="space-y-6 text-lg leading-8 text-muted-foreground text-center mb-12">
           <p>
-            Great food should be effortless. We realized that to truly modernize the maki, we couldn't just fix the packaging—we had to fix the entire process. Traditional dining is analog and slow; we built Sushi Rabo to be digital and fluid.
+            Great food should be effortless. We realized that to truly modernize the maki, we couldn&apos;t just fix the packaging—we had to fix the entire process. Traditional dining is analog and slow; we built Sushi Rabo to be digital and fluid.
           </p>
           <p>
             Sushi Rabo is a technology-first company re-engineering the lunch break. By combining an intuitive ordering OS with our sustainable push-tube design, we eliminate the queues, the wait, and the mess. 
           </p>
           <p>
-            We don't just deliver maki. We deliver flow.
+            We don&apos;t just deliver maki. We deliver flow.
           </p>
         </div>
 

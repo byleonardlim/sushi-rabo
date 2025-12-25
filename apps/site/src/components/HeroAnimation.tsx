@@ -36,8 +36,10 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
 
     const onAssetsLoaded = () => setAssetsLoaded(true);
     
-    if ((window as any).sushiRaboAssetsLoaded) {
-      setAssetsLoaded(true);
+    // Check if assets already loaded and set state in callback
+    if ((window as unknown as { sushiRaboAssetsLoaded?: boolean }).sushiRaboAssetsLoaded) {
+      // Use setTimeout to defer setState until after effect execution
+      setTimeout(() => setAssetsLoaded(true), 0);
     }
     
     window.addEventListener('sushi-rabo-assets-loaded', onAssetsLoaded);

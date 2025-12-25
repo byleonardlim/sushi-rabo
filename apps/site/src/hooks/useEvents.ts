@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { ASSET_EVENTS } from '@/lib/constants';
 
 export function useAssetLoading() {
@@ -8,9 +8,10 @@ export function useAssetLoading() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Check if assets already loaded
-    if ((window as any).sushiRaboAssetsLoaded) {
-      setAssetsLoaded(true);
+    // Check if assets already loaded and set state in callback
+    if ((window as unknown as { sushiRaboAssetsLoaded?: boolean }).sushiRaboAssetsLoaded) {
+      // Use setTimeout to defer setState until after effect execution
+      setTimeout(() => setAssetsLoaded(true), 0);
       return;
     }
     

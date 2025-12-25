@@ -31,7 +31,7 @@ export const lockBodyScroll = () => {
 };
 
 // Event dispatch utilities
-export const dispatchAssetEvent = (type: 'loaded' | 'progress', detail?: any) => {
+export const dispatchAssetEvent = (type: 'loaded' | 'progress', detail?: unknown) => {
   if (typeof window === 'undefined') return;
   
   const eventName = type === 'loaded' ? 'sushi-rabo-assets-loaded' : 'sushi-rabo-assets-progress';

@@ -199,7 +199,7 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
 
     if (!hasDispatchedLoaded.current && typeof window !== "undefined") {
       hasDispatchedLoaded.current = true;
-      (window as any).sushiRaboAssetsLoaded = true;
+      (window as unknown as { sushiRaboAssetsLoaded?: boolean }).sushiRaboAssetsLoaded = true;
       window.dispatchEvent(new Event("sushi-rabo-assets-loaded"));
     }
 

@@ -11,6 +11,8 @@ interface WaitlistModalProps {
   onClose: () => void;
 }
 
+import Image from "next/image";
+
 export function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -118,9 +120,11 @@ export function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
         <div className="w-full">
           {/* Logo */}
           <div className="flex justify-center mb-6">
-            <img
+            <Image
               src="/assets/svg/sushi-rabo-brand.svg"
               alt="Sushi Rabo Logo"
+              width={64}
+              height={64}
               className="w-16 h-auto"
             />
           </div>
