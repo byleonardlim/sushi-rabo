@@ -150,7 +150,7 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
   }, [isLoaded, assetsLoaded]); // Depend on loading signals
 
   return (
-    <div ref={containerRef} className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden pt-24 sm:pt-32 lg:pt-40 pb-10 z-10">
+    <div ref={containerRef} className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden pt-24 lg:pt-16 pb-10 z-10">
       {/* Background Gradient (revealed as overlay fades) */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_40%_at_50%_50%,var(--surface)_0%,transparent_100%)] opacity-30" />
 
@@ -198,7 +198,7 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Hero Content (passed as children) */}
-        <div ref={contentRef} className="w-full flex flex-col items-center opacity-0">
+        <div ref={contentRef} className="w-full flex flex-col justify-center items-center opacity-0">
             {children}
         </div>
       </div>

@@ -2,8 +2,45 @@
 
 import { useState } from "react";
 import { ArrowRight, Check } from "lucide-react";
+import { buttonBase, buttonSizes, buttonVariants } from "./ui/button";
 
-export function WaitlistForm() {
+interface WaitlistButtonProps {
+  onClick: () => void;
+  variant?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}
+
+function WaitlistButton({ 
+  onClick, 
+  variant = "primary", 
+  size = "sm",
+  className = ""
+}: WaitlistButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`${buttonBase} ${buttonVariants[variant]} ${buttonSizes[size]} ${className}`}
+    >
+      <span>Be the first to know</span>
+      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+    </button>
+  );
+}
+
+export function WaitlistForm({ 
+  showButton = false, 
+  onButtonClick, 
+  buttonVariant = "primary", 
+  buttonSize = "sm",
+  buttonClassName = ""
+}: {
+  showButton?: boolean;
+  onButtonClick?: () => void;
+  buttonVariant?: "primary" | "secondary";
+  buttonSize?: "sm" | "md" | "lg";
+  buttonClassName?: string;
+} = {}) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -50,40 +87,65 @@ export function WaitlistForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full max-w-lg flex-col gap-2">
-      {status === "error" && errorMessage ? (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600">
-          {errorMessage}
-        </div>
-      ) : null}
-
-      <div className="flex flex-col gap-2 sm:flex-row">
-      <input
-        type="email"
-        placeholder="Enter your email address"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-          if (status === "error") {
-            setStatus("idle");
-          }
-          if (errorMessage) {
-            setErrorMessage(null);
-          }
-        }}
-        required
-        disabled={status === "submitting"}
-        className="flex-1 rounded-full border border-surface-foreground/20 bg-surface/50 px-6 py-3 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all"
-      />
-      <button
-        type="submit"
-        disabled={status === "submitting"}
-        className="group flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
-      >
-        <span>Be the first to know</span>
-        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-      </button>
+    <div className="w-full max-w-2xl mx-auto space-y-8">
+      <div className="text-center space-y-3">
+        <h3 className="text-xl font-semibold text-foreground">
+          Launching Early 2026
+        </h3>
+        <p className="text-muted-foreground">
+          Be part of the journey and get exclusive early access.
+        </p>
       </div>
-    </form>
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {status === "error" && errorMessage ? (
+          <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600 animate-in fade-in slide-in-from-top-2">
+            {errorMessage}
+          </div>
+        ) : null}
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <input
+            type="email"
+            placeholder="Enter your email address"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (status === "error") {
+                setStatus("idle");
+              }
+              if (errorMessage) {
+                setErrorMessage(null);
+              }
+            }}
+            required
+            disabled={status === "submitting"}
+            className="flex-1 h-12 rounded-full border border-surface-foreground/20 bg-surface/50 px-6 text-base placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 transition-all duration-200"
+          />
+          <button
+            type="submit"
+            disabled={status === "submitting"}
+            className={`${buttonBase} ${buttonVariants.primary} ${buttonSizes.md} disabled:opacity-50 h-12 px-8 min-w-[140px]`}
+          >
+            <span>Join Waitlist</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </button>
+        </div>
+      </form>
+
+      {showButton && onButtonClick && (
+        <div className="w-full max-w-lg">
+          <WaitlistButton 
+            onClick={onButtonClick} 
+            variant={buttonVariant} 
+            size={buttonSize} 
+            className={buttonClassName} 
+          />
+        </div>
+      )}
+    </div>
   );
 }
+
+// Export WaitlistButton for external use
+export { WaitlistButton };
