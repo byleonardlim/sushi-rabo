@@ -23,7 +23,7 @@ function HomeContent() {
           </h1>
           
           <p className="mt-6 max-w-3xl text-xl text-center leading-8 text-muted-foreground">
-            Forget the chopsticks. Build your custom maki and experience the &quot;Push-Pop&quot; revolution. Zero mess, maximum flavor, designed for the modern hustle.
+            Build your custom maki and experience the &quot;Push-Pop&quot; revolution. Zero mess, maximum flavor, designed for the modern hustle.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 w-full">
