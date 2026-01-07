@@ -120,12 +120,12 @@ export function WaitlistForm({
             }}
             required
             disabled={status === "submitting"}
-            className="flex-1 h-12 rounded-full border border-surface-foreground/20 bg-surface/50 px-6 text-base placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 transition-all duration-200"
+            className="w-full h-12 rounded-full border border-surface-foreground/20 bg-surface/50 px-6 text-base placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 transition-all duration-200 sm:flex-1 sm:min-w-0"
           />
           <button
             type="submit"
             disabled={status === "submitting"}
-            className={`${buttonBase} ${buttonVariants.primary} ${buttonSizes.md} disabled:opacity-50 h-12 px-8 min-w-[140px]`}
+            className={`${buttonBase} ${buttonVariants.primary} ${buttonSizes.md} disabled:opacity-50 h-12 w-full px-6 sm:w-auto sm:px-8 sm:min-w-[140px]`}
           >
             <span>Join Waitlist</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
