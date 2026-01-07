@@ -9,9 +9,10 @@ gsap.registerPlugin(ScrollTrigger);
 export function HeroAnimation({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
-  const introLogoRef = useRef<HTMLImageElement>(null);
+  const introLogoRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const loaderRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [assetsProgress, setAssetsProgress] = useState(0);
@@ -23,6 +24,33 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
     logoRef.current = node;
     if (node?.complete) setIsLoaded(true);
   }, []);
+
+  // Handle Loader Animation with GSAP
+  useEffect(() => {
+    if (!loaderRef.current) return;
+    
+    // Animate clip-path to "fill" the logo from bottom to top
+    // 100% inset at top means empty, 0% means full
+    gsap.to(loaderRef.current, {
+      clipPath: `inset(${100 - assetsProgress}% 0px 0px 0px)`,
+      duration: 0.5,
+      ease: 'power2.out',
+      overwrite: 'auto'
+    });
+  }, [assetsProgress]);
+
+  useEffect(() => {
+    // When loaded, ensure it's fully filled (though progress should handle this)
+    // We don't need to fade it out here because the whole introLogoRef container 
+    // gets animated away in the main timeline later.
+    if (assetsLoaded && loaderRef.current) {
+      gsap.to(loaderRef.current, {
+        clipPath: 'inset(0% 0px 0px 0px)',
+        duration: 0.5,
+        overwrite: 'auto'
+      });
+    }
+  }, [assetsLoaded]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -166,22 +194,33 @@ export function HeroAnimation({ children }: { children: React.ReactNode }) {
 
       {isIntro && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          {/* Gradient Loader Indicator */}
+          {/* Liquid Logo Container */}
           <div 
-            className="absolute w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-[radial-gradient(circle,var(--color-primary)_0%,transparent_100%)] rounded-full blur-3xl transition-all duration-300 ease-out -z-10"
-            style={{ 
-              opacity: assetsLoaded ? 0 : Math.max(0.1, assetsProgress / 100 * 0.3), // Max opacity 0.3 to keep it subtle
-              transform: `scale(${0.5 + (assetsProgress / 100) * 0.5})` 
-            }}
-          />
-
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
             ref={introLogoRef}
-            src="/assets/svg/sushi-rabo-brand.svg"
-            alt="Sushi Rabo Logo"
-            className="w-24 sm:w-36 md:w-[15vw] max-w-[240px] h-auto block"
-          />
+            className="relative w-24 sm:w-36 md:w-[15vw] max-w-[240px] h-auto"
+          >
+            {/* 1. Ghost Layer (Background) */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/svg/sushi-rabo-brand.svg"
+              alt="Sushi Rabo Logo Ghost"
+              className="w-full h-full block opacity-5"
+            />
+            
+            {/* 2. Fill Layer (Foreground - Clipped) */}
+            <div 
+              ref={loaderRef}
+              className="absolute inset-0 w-full h-full"
+              style={{ clipPath: 'inset(100% 0 0 0)' }} // Start empty (clipped from top)
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/assets/svg/sushi-rabo-brand.svg"
+                alt="Sushi Rabo Logo Fill"
+                className="w-full h-full block"
+              />
+            </div>
+          </div>
         </div>
       )}
 
