@@ -5,7 +5,7 @@ import { Environment, useGLTF, useProgress } from "@react-three/drei";
 import { Suspense, useLayoutEffect, useRef, RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import type { Object3D } from "three";
+import * as THREE from "three";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,11 +37,13 @@ function LoadingEvents() {
 }
 
 function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObject<HTMLElement | null> }) {
-  const { scene, nodes } = useGLTF("/3d/product.glb");
+  const { scene, nodes } = useGLTF("/3d/cardboard-packaging-v2.glb");
   const { camera } = useThree();
-  const modelRef = useRef<Object3D | null>(null);
+  const modelRef = useRef<THREE.Object3D | null>(null);
   const sushiMakiOriginalY = useRef<number | null>(null);
   const topCoverOriginalY = useRef<number | null>(null);
+  const sauceGroupRef = useRef<THREE.Group>(null);
+  const sauceOriginalY = useRef<number | null>(null);
   const hasDispatchedLoaded = useRef(false);
 
   useLayoutEffect(() => {
@@ -64,6 +66,37 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
 
     if (nodes.Top_Cover && topCoverOriginalY.current === null) {
       topCoverOriginalY.current = nodes.Top_Cover.position.y;
+    }
+
+    // Create sauce group and reparent sauce nodes
+    const sauceGroup = sauceGroupRef.current;
+    const sauceNodes = [
+      nodes.Bottom_Sauce_Cap,
+      nodes.Sauce,
+      nodes.Sauce_Tube,
+      nodes.Top_Sauce_Cap,
+    ];
+
+    if (sauceGroup && !sauceGroup.children.length && sauceNodes.every(n => n)) {
+      // Save original position if needed, though we assume 0,0,0 relative to parent for now
+      // But we are reparenting. The nodes are children of scene currently.
+      // Their transforms are local to scene.
+      // We add them to sauceGroup. sauceGroup is added to scene (via JSX ref if we put it there, or we do it here).
+      // Let's use a group in JSX.
+      
+      // Make materials transparent for fading
+      sauceNodes.forEach((node) => {
+        if (node) {
+          sauceGroup.add(node);
+          node.traverse((child: any) => {
+            if (child.isMesh && child.material) {
+              child.material.transparent = true;
+              // Ensure we don't mess up existing opacity if it's not 1
+              // But for fading out/in, we'll control opacity.
+            }
+          });
+        }
+      });
     }
 
     const ctx = gsap.context(() => {
@@ -104,7 +137,7 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
         tl.to(
           nodes.Sushi_Maki.position,
           {
-            y: 1.5, // Move along Y axis
+            y: 0.45, // Move along Y axis
             duration: 0.8,
             ease: "power1.inOut",
           },
@@ -146,6 +179,58 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
             ease: "power1.inOut",
           },
           1.2
+        );
+      }
+
+      // 4. Animate Sauce Group (Detach and Fade)
+      if (sauceGroupRef.current) {
+        const sauceMats: THREE.Material[] = [];
+        sauceGroupRef.current.traverse((child: any) => {
+          if (child.isMesh && child.material) {
+            sauceMats.push(child.material);
+          }
+        });
+
+        // Detach and fade out at start
+        tl.to(
+          sauceGroupRef.current.position,
+          {
+            y: 5, // Move away
+            ease: "power1.inOut",
+            duration: 1,
+          },
+          0
+        );
+        
+        tl.to(
+          sauceMats,
+          {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power1.inOut",
+          },
+          0
+        );
+
+        // Bring back near the end
+        tl.to(
+          sauceGroupRef.current.position,
+          {
+            y: 0,
+            ease: "power1.inOut",
+            duration: 1,
+          },
+          1.5 
+        );
+        
+        tl.to(
+          sauceMats,
+          {
+            opacity: 1,
+            duration: 0.5,
+            ease: "power1.inOut",
+          },
+          2.0
         );
       }
 
@@ -215,7 +300,9 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
       object={scene} 
       scale={1.2} 
       rotation={[0, Math.PI / 2.03, 0]}
-    />
+    >
+      <group ref={sauceGroupRef} />
+    </primitive>
   );
 }
 
@@ -241,4 +328,4 @@ export function ProductViewer({ domRefs, triggerRef }: ProductViewerProps) {
   );
 }
 
-useGLTF.preload("/3d/product.glb");
+useGLTF.preload("/3d/cardboard-packaging-v2.glb");
