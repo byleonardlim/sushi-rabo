@@ -65,14 +65,10 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} antialiased overflow-x-hidden`}
       >
-        <script
-          defer
-          src="https://cdn.overtracking.com/t/tSBhikuuVbm46HnIJ/"
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <script 
+          defer 
+          src="https://cdn.overtracking.com/t/tSBhikuuVbm46HnIJ/">
+        </script>
         {children}
       </body>
     </html>
