@@ -83,17 +83,22 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
       // Their transforms are local to scene.
       // We add them to sauceGroup. sauceGroup is added to scene (via JSX ref if we put it there, or we do it here).
       // Let's use a group in JSX.
+      if (sauceOriginalY.current === null) {
+        sauceOriginalY.current = sauceGroup.position.y;
+      }
       
       // Make materials transparent for fading
       sauceNodes.forEach((node) => {
         if (node) {
           sauceGroup.add(node);
-          node.traverse((child: any) => {
-            if (child.isMesh && child.material) {
-              child.material.transparent = true;
-              // Ensure we don't mess up existing opacity if it's not 1
-              // But for fading out/in, we'll control opacity.
-            }
+          node.traverse((child: THREE.Object3D) => {
+            if (!(child instanceof THREE.Mesh)) return;
+            const mesh = child as THREE.Mesh;
+            const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            materials.forEach((mat) => {
+              if (!mat) return;
+              mat.transparent = true;
+            });
           });
         }
       });
@@ -185,10 +190,13 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
       // 4. Animate Sauce Group (Detach and Fade)
       if (sauceGroupRef.current) {
         const sauceMats: THREE.Material[] = [];
-        sauceGroupRef.current.traverse((child: any) => {
-          if (child.isMesh && child.material) {
-            sauceMats.push(child.material);
-          }
+        sauceGroupRef.current.traverse((child: THREE.Object3D) => {
+          if (!(child instanceof THREE.Mesh)) return;
+          const mesh = child as THREE.Mesh;
+          const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+          materials.forEach((mat) => {
+            if (mat) sauceMats.push(mat);
+          });
         });
 
         // Detach and fade out at start
@@ -216,7 +224,7 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
         tl.to(
           sauceGroupRef.current.position,
           {
-            y: 0,
+            y: sauceOriginalY.current ?? 0,
             ease: "power1.inOut",
             duration: 1,
           },
