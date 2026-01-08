@@ -41,7 +41,7 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
   const { camera } = useThree();
   const modelRef = useRef<Object3D | null>(null);
   const sushiMakiOriginalY = useRef<number | null>(null);
-  const tubeCoverOriginalY = useRef<number | null>(null);
+  const topCoverOriginalY = useRef<number | null>(null);
   const hasDispatchedLoaded = useRef(false);
 
   useLayoutEffect(() => {
@@ -62,8 +62,8 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
       sushiMakiOriginalY.current = nodes.Sushi_Maki.position.y;
     }
 
-    if (nodes.Tube_Cover && tubeCoverOriginalY.current === null) {
-      tubeCoverOriginalY.current = nodes.Tube_Cover.position.y;
+    if (nodes.Top_Cover && topCoverOriginalY.current === null) {
+      topCoverOriginalY.current = nodes.Top_Cover.position.y;
     }
 
     const ctx = gsap.context(() => {
@@ -104,7 +104,7 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
         tl.to(
           nodes.Sushi_Maki.position,
           {
-            y: 0.8, // Move along Y axis
+            y: 1.5, // Move along Y axis
             duration: 0.8,
             ease: "power1.inOut",
           },
@@ -112,12 +112,12 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
         );
       }
 
-      // 3. Staggered Tube_Cover object Y translation
-      if (nodes.Tube_Cover) {
+      // 3. Staggered Top_Cover object Y translation
+      if (nodes.Top_Cover) {
         tl.to(
-          nodes.Tube_Cover.position,
+          nodes.Top_Cover.position,
           {
-            y: 1.5, // Move along Y axis
+            y: 0.8, // Move along Y axis
             duration: 0.8,
             ease: "power1.inOut",
           },
@@ -137,11 +137,11 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
         );
       }
 
-      if (nodes.Tube_Cover && tubeCoverOriginalY.current !== null) {
+      if (nodes.Top_Cover && topCoverOriginalY.current !== null) {
         tl.to(
-          nodes.Tube_Cover.position,
+          nodes.Top_Cover.position,
           {
-            y: tubeCoverOriginalY.current,
+            y: topCoverOriginalY.current,
             duration: 0.8,
             ease: "power1.inOut",
           },
@@ -213,8 +213,8 @@ function Model({ domRefs, triggerRef }: { domRefs?: DOMRefs; triggerRef?: RefObj
     <primitive 
       ref={modelRef}
       object={scene} 
-      scale={1} 
-      rotation={[0, Math.PI / 1.03, 0]}
+      scale={1.2} 
+      rotation={[0, Math.PI / 2.03, 0]}
     />
   );
 }
@@ -231,7 +231,7 @@ export function ProductViewer({ domRefs, triggerRef }: ProductViewerProps) {
         <LoadingEvents />
         <ambientLight intensity={1} />
         <pointLight position={[-10, 10, 10]} intensity={0.5} />
-        <Environment preset="warehouse" />
+        <Environment preset="city" />
         
         <Suspense fallback={null}>
           <Model domRefs={domRefs} triggerRef={triggerRef} />
