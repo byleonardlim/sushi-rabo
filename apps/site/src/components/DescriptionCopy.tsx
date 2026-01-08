@@ -24,7 +24,7 @@ export function DescriptionCopy({ cleanRef, goRef }: DescriptionCopyProps) {
           <span className="text-primary">Truly On The Go.</span>
         </h2>
         <p className="max-w-3xl mx-auto text-lg leading-8 text-muted-foreground text-center">
-          Built for commutes, meetings, and everything in between. Pop the cap, push your maki, and keep moving &mdash; no spills, no balancing act, no awkward mid-walk bites. It&rsquo;s sushi that fits your pace.
+          Built for commutes, meetings, and everything in between. Pop the cap, push your maki, and keep moving &mdash; no spills, no balancing act, no awkward mid-walk bites. It&rsquo;s the sushi that fits your pace.
         </p>
       </div>
     </div>
